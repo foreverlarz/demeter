@@ -12,6 +12,9 @@ const char* wifi_pass = "wifipass"; // Wifi passphrase
 const char* ntp_hostname = "time.nist.gov"; // NTP server hostname
 
 // Define electronic component locations
+const int pin_led = 0;
+const int pin_button = 4;
+const int pin_water = 5;
 const int pin_sda = 12;
 const int pin_scl = 13;
 const int lcd_addr = 0x71;
@@ -34,6 +37,13 @@ time_t time_displayed;
 const int col_max = 32; // max columns
 int col_loc = 0;
 
+// Watering constants and variables
+const int water_duration_manual = 10 * 60; // 10 minutes of seconds
+const int water_duration_auto = 10 * 60; // 10 minutes of seconds
+boolean watering = 0;
+int water_begin = 0;
+int water_end = 0;
+
 Adafruit_7segment matrix = Adafruit_7segment();
 WiFiUDP udp;
 IPAddress ntp_address;
@@ -44,6 +54,9 @@ void setup() {
   matrix.begin(lcd_addr);
   matrix.writeDisplay();
   Serial.begin(115200);
+  pinMode(pin_led, OUTPUT);
+  pinMode(pin_water, OUTPUT);
+  
   delay(1000);
   Serial.println("\n\n\nWelcome to __demeter__!");
 
@@ -78,15 +91,44 @@ void setup() {
   setSyncProvider(get_ntp_time);
   setSyncInterval(delay_ntp_sync);
   
+  // Turn off LED (Why high? I don't know.)
+  digitalWrite(pin_led, HIGH);
+  // Turn off water
+  digitalWrite(pin_water, LOW);
+  
 }
 
 void loop() {
+  
+  // If not currently watering and button is pressed, begin manual watering
+  if (!watering & digitalRead(pin_button) == HIGH) {
+    water_begin = now();
+    water_end = water_begin + water_duration_manual;
+    digitalWrite(pin_water, HIGH); // Turn on water
+    digitalWrite(pin_led, LOW); // Turn on LED
+    watering = 1;
+    delay(500);
+  }
+  
+  // If currently watering and past the end of watering window, stop watering
+  if (watering & water_end < now()) {
+    digitalWrite(pin_water, LOW); // Turn off water
+    digitalWrite(pin_led, HIGH); // Turn off LED
+    watering = 0;
+    water_begin = 0;
+    water_end = 0;
+  }
+
+  // If the time has been set successfully
   if (timeStatus() != timeNotSet) {
-    if (now() != time_displayed) {
+    // If the displayed time is not the current time
+    if (time_displayed != now()) {
+      // Display the current time
       print_time_7seg();
       time_displayed = now();
     }
   }
+
 }
 
 int print_serial_dot_loop() {

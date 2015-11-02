@@ -5,9 +5,9 @@ Automated embedded watering system for outdoor plants.
 * Wifi connectivity: working
 * NTP sync: working
 * Timekeeping: working
-* Weather: unimplemented
-* Manual watering: unimplemented
+* Manual watering: working
 * Automatic watering: unimplemented
+* Weather-dependent watering: unimplemented
 
 **Parts list:**
 * Adafruit Huzzah ESP8266 module
