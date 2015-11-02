@@ -12,12 +12,12 @@ const char* wifi_pass = "wifipass"; // Wifi passphrase
 const char* ntp_hostname = "time.nist.gov"; // NTP server hostname
 
 // Define electronic component locations
-const int pin_led = 0;
-const int pin_button = 4;
-const int pin_water = 5;
-const int pin_sda = 12;
-const int pin_scl = 13;
-const int lcd_addr = 0x71;
+const int pin_button = 12;
+const int pin_water = 13;
+const int pin_led = 0; // ESP8266 default
+const int pin_sda = 4; // ESP8266 default
+const int pin_scl = 5; // ESP8266 default
+const int lcd_addr = 0x70; // LCD backpack default
 
 // Define networking and time constants
 const int delay_ntp_sync = 5 * 60; // 5 minutes of seconds
